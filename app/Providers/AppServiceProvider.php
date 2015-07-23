@@ -23,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('App\Contracts\Action\Store', function($app) {
+            return $this->app->make('App\Database\DynamoDb');
+        });
         $this->app->singleton('App\Contracts\Action\Service', function($app) {
             return $app->make('App\Services\ActionService');
         });

@@ -15,10 +15,14 @@ return [
     |
     */
     'credentials' => [
-        'key'    => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'key'    => '',
+        'secret' => '',
     ],
     'region' => env('AWS_REGION', 'us-east-1'),
     'version' => 'latest',
+
+    'DynamoDb' => [
+        'endpoint' => 'http://192.168.10.1:8080/',
+    ],
 
 ];

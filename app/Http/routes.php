@@ -14,3 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test', 'Test@index');
+
+
+Route::match(['put', 'post'], '/action', 'ActionController@store');

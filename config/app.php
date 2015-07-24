@@ -145,9 +145,6 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Aws\Laravel\AwsServiceProvider::class,
-
-        App\Providers\ActionStoreServiceProvider::class,
-
     ],
 
     /*

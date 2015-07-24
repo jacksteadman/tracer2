@@ -27,7 +27,7 @@ namespace :composer do
 	task :update_dependencies do
 		on roles(:web, :api, :worker) do
 			within release_path do
-				execute "cd #{release_path} && composer update --no-dev --verbose --prefer-dist --optimize-autoloader"
+				execute "cd #{release_path} && ./composer update --no-dev --verbose --prefer-dist --optimize-autoloader"
 			end
 		end
 	end
@@ -36,7 +36,7 @@ namespace :composer do
 	task :install_dependencies do
 		on roles(:web, :api, :worker) do
 			within release_path do
-				execute "cd #{release_path} && composer install --no-dev --verbose"
+				execute "cd #{release_path} && ./composer install --no-dev --verbose"
 			end
 		end
 	end

@@ -22,6 +22,21 @@ class DynamoDb implements Action\Store {
         $this->marshaler = new Marshaler();
     }
 
+    public function getActionByUniquenessKey($user_id, $uniqueness_key) {
+        $response = $this->client->query([
+            'TableName' => 'tr_actions',
+            'IndexName' => 'uniqueness_key-index',
+            'KeyConditionExpression' => 'user_id = :user_id AND uniqueness_key = :u_key',
+            'ExpressionAttributeValues' => [
+                ':user_id' => [ 'S' => $user_id ],
+                ':u_key' => [ 'S' => $uniqueness_key ],
+            ],
+            'Limit' => 1,
+        ]);
+
+        return (isset($response['Items']) ? $response['Items'] : null);
+    }
+
     public function storeAction(\App\Action $action) {
         $data = $action->toArray();
         // TODO error handling

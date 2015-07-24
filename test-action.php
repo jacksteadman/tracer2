@@ -8,7 +8,6 @@ $action = [
 	'data' => [ 'foo' => 'bar', 'baz' => 'foo' ],
 	'tags' => [ 'tag1', 'tag2', 'tag3' ],
 	'sources' => [ 'source1' ],
-
 ];
 
 

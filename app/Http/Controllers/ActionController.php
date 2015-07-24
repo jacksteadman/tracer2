@@ -50,7 +50,10 @@ class ActionController extends Controller
         $action->referral_code = $referral_code;
 
         try {
-            $this->as->storeAction($action);
+            $rv = $this->as->storeAction($action);
+            if ($rv === false) {
+                throw new \Exception('Action already exists');
+            }
         } catch (\Exception $e) {
             return $this->error($e);
         }

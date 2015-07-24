@@ -69,7 +69,12 @@ class ActionService implements Action\Service {
     }
 
     public function storeAction(\App\Action $action) {
+        if ($this->storage->getActionByUniquenessKey($action->user_id, $action->uniqueness_key)) {
+            return false;
+        }
+
         $this->storage->storeAction($action);
+        return true;
     }
 
     public function generateUserId() {

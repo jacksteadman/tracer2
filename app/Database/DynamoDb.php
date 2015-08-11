@@ -4,6 +4,7 @@ namespace App\Database;
 use App\Contracts\Action;
 use \Aws\Sdk;
 use \Aws\DynamoDb\Marshaler;
+use \Aws\DynamoDb\Exception\DynamoDbException;
 
 class DynamoDb implements Action\Store {
 
@@ -34,7 +35,31 @@ class DynamoDb implements Action\Store {
             'Limit' => 1,
         ]);
 
-        return (isset($response['Items']) ? $response['Items'] : null);
+        if (!empty($response['Items'])) {
+            $action = new \App\Action();
+            $action->fromArray($this->marshaler->unmarshalItem($response['Items'][0]));
+            return $action;
+        }
+
+        return null;
+    }
+
+    public function getCounter($key) {
+        $response = $this->client->GetItem([
+            'TableName' => 'tr_counters',
+            'Key' => [
+                'counter_key' => [
+                    'S' => $key,
+                ]
+            ]
+        ]);
+
+        if (isset($response['Item'])) {
+            $counter = $this->marshaler->unmarshalItem($response['Item']);
+            return $counter['v'];
+        }
+
+        return null;
     }
 
     public function storeAction(\App\Action $action) {
@@ -46,7 +71,40 @@ class DynamoDb implements Action\Store {
         ]);
     }
 
-    public function storeReferralCode($code, $user_id, $timestamp) {
+    public function incrementCounter($key) {
+        $this->createCounterIfNotExists($key);
+        $rv = $this->client->UpdateItem(
+            [
+                'TableName' => 'tr_counters',
+                'Key' => [ 'counter_key' => [ 'S' => $key ]],
+                'UpdateExpression' => 'SET v = v + :inc',
+                'ExpressionAttributeValues' => [ ':inc' => [ 'N' => 1 ]],
+                'ReturnValues' => 'UPDATED_NEW',
+            ]
+        );
+
+        return $rv['Attributes']['v']['N'];
+    }
+
+    public function createCounterIfNotExists($key) {
+        try {
+            $this->client->UpdateItem(
+                [
+                    'TableName' => 'tr_counters',
+                    'Key' => ['counter_key' => ['S' => $key]],
+                    'UpdateExpression' => 'SET v = :val',
+                    'ExpressionAttributeValues' => [':val' => ['N' => 0]],
+                    'ConditionExpression' => 'attribute_not_exists (v)',
+                ]
+            );
+        } catch (DynamoDbException $e) {
+            if ($e->getAwsErrorCode() === 'ConditionalCheckFailedException') {}
+            // TODO
+        }
+    }
+
+    public function storeReferralCode($code, $user_id, $timestamp)
+    {
         $data = [
             'code' => $code,
             'user_id' => $user_id,
@@ -73,7 +131,4 @@ class DynamoDb implements Action\Store {
             'Item' => $this->marshaler->marshalItem($data),
         ]);
     }
-
-
-
 }

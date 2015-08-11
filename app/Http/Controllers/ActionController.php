@@ -51,9 +51,6 @@ class ActionController extends Controller
 
         try {
             $rv = $this->as->storeAction($action);
-            if ($rv === false) {
-                throw new \Exception('Action already exists');
-            }
         } catch (\Exception $e) {
             return $this->error($e);
         }
@@ -61,7 +58,9 @@ class ActionController extends Controller
         $response_data = [
             'user_id' => $user_id,
             'referral_code' => $referral_code,
-            'action' => $action->toArray(),
+            'is_new' => $rv['is_new'],
+            'counter' => $rv['counter'],
+            'action' => $rv['action']->toArray(),
         ];
 
         $response_json = json_encode($response_data);

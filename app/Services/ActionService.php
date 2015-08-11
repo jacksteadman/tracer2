@@ -69,15 +69,28 @@ class ActionService implements Action\Service {
     }
 
     public function storeAction(\App\Action $action) {
-        if ($this->storage->getActionByUniquenessKey($action->user_id, $action->uniqueness_key)) {
-            return false;
+        if ($existing = $this->storage->getActionByUniquenessKey($action->user_id, $action->uniqueness_key)) {
+            return [
+                'is_new' => false,
+                'counter' => $this->storage->getCounter($action->counter_key),
+                'action' => $existing,
+            ];
         }
 
         $this->storage->storeAction($action);
-        return true;
+        $ctr = $this->storage->incrementCounter($action->counter_key);
+        return [
+            'is_new' => true,
+            'counter' => $ctr,
+            'action' => $action,
+        ];
+    }
+
+    public function getCounter($counter_key) {
+        return (int)$this->storage->getCounter($counter_key);
     }
 
     public function generateUserId() {
-        return uniqid('', true);
+        return uniqid('tr', true);
     }
 }

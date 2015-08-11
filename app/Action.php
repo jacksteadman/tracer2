@@ -69,6 +69,12 @@ class Action {
         return $array;
     }
 
+    public function fromArray($array) {
+        foreach (array_keys($array) as $key) {
+            $this->$key = $array[$key];
+        }
+    }
+
 
     public function __get($property) {
         return $this->$property;

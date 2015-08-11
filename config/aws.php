@@ -15,14 +15,14 @@ return [
     |
     */
     'credentials' => [
-        'key'    => '',
-        'secret' => '',
+        'key'    => 'AKIAI2D3ZMXETIEPNJKQ',
+        'secret' => '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',
     ],
     'region' => env('AWS_REGION', 'us-east-1'),
     'version' => 'latest',
 
     'DynamoDb' => [
-        'endpoint' => 'http://192.168.10.1:8080/',
+        'endpoint' => (env('APP_ENV', 'local') == 'local' ? 'http://192.168.10.1:8080/' : null),
     ],
 
 ];
